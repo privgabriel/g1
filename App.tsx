@@ -11,14 +11,12 @@ import AddUserScreen from "./src/screens/AddUserScreen";
 import EditUserScreen from "./src/screens/EditUsersScreen";
 import EditUsersScreen from "./src/screens/EditUsersScreen";
 
-// Definindo os parâmetros que as telas esperam
 type RootStackParamList = {
     Home: undefined;
     UserDetails: { userId: number };
     Tabs: undefined;
 };
 
-// Criando o Tab Navigator
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
@@ -31,7 +29,7 @@ const TabNavigator = () => {
                     tabBarIcon: ({ color, size }) => (
                         <Icon name="home-outline" color={color} size={size} />
                     ),
-                    tabBarLabel: "Início", // Altera o label se necessário
+                    tabBarLabel: "Início",
                 }}
             />
             <Tab.Screen
@@ -48,7 +46,6 @@ const TabNavigator = () => {
     );
 };
 
-// Criando o Stack Navigator para as telas Home e UserDetails
 const Stack = createStackNavigator<RootStackParamList>();
 
 const HomeStackNavigator = () => {
@@ -57,18 +54,17 @@ const HomeStackNavigator = () => {
             <Stack.Screen
                 name="Tabs"
                 component={TabNavigator}
-                options={{ headerShown: false }} // Oculta o header da navegação por tabs
+                options={{ headerShown: false }} 
             />
             <Stack.Screen
                 name="UserDetails"
                 component={UserDetailsScreen}
-                options={{ title: "Detalhes do Usuário" }} // Mostra o título na tela de detalhes
+                options={{ title: "Detalhes do Usuário" }}
             />
         </Stack.Navigator>
     );
 };
 
-// Criando o Drawer Navigator para Home e About
 const Drawer = createDrawerNavigator();
 
 const App = () => {

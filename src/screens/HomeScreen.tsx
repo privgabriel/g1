@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, FlatList, StyleSheet, TouchableOpacity, Text, TextInput, Modal, Alert } from "react-native";
 import axios from "axios";
-import { useIsFocused } from "@react-navigation/native"; // Importar useIsFocused
+import { useIsFocused } from "@react-navigation/native";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import UserCard from "../components/UserCard";
@@ -10,83 +10,81 @@ type User = {
   id: number;
   name: string;
   email: string;
+  login: string;
+  password: string;
+  city: string;
 };
 
 const HomeScreen = () => {
   const [users, setUsers] = useState<User[]>([]);
-  const [newUser, setNewUser] = useState({ name: "", email: "" });
-  const [editingUser, setEditingUser] = useState<User | null>(null); // Estado para controlar o usuário sendo editado
-  const [addModalVisible, setAddModalVisible] = useState(false); // Controle do modal para adicionar
-  const [editModalVisible, setEditModalVisible] = useState(false); // Controle do modal para editar
+  const [newUser, setNewUser] = useState<User>({ name: "", email: "", login: "", password: "", city: "" });
+  const [editingUser, setEditingUser] = useState<User | null>(null); 
+  const [addModalVisible, setAddModalVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
 
-  const isFocused = useIsFocused(); // Hook para verificar se a tela está focada
+  const isFocused = useIsFocused(); 
 
-  // Função para buscar os usuários da API
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("http://192.168.100.6:3000/users");
+      const response = await axios.get("http://192.168.100.6:3001/users");
       setUsers(response.data);
     } catch (error) {
       console.error("Erro ao buscar usuários:", error);
     }
   };
 
-  // Executa o fetchUsers quando a tela estiver focada
   useEffect(() => {
     if (isFocused) {
-      fetchUsers(); // Busca os usuários toda vez que a tela é focada
+      fetchUsers(); 
     }
   }, [isFocused]);
 
-  // Função para adicionar um novo usuário
-  const addUser = async () => {
-    if (newUser.name === "" || newUser.email === "") {
-      Alert.alert("Erro", "Nome e email são obrigatórios.");
+  
+  const AddNewUser = async () => {
+    if (newUser.name === "" || newUser.email === "" || newUser.login === "" || newUser.password === "" || newUser.city === "") {
+      Alert.alert("Erro", "Todos os campos são obrigatórios.");
       return;
     }
 
     try {
-      const response = await axios.post("http://192.168.100.6:3000/users", newUser);
-      setUsers((prevUsers) => [...prevUsers, response.data]); // Adiciona o novo usuário na lista
-      setNewUser({ name: "", email: "" }); // Reseta os campos do modal
-      setAddModalVisible(false); // Fecha o modal
+      const response = await axios.post("http://192.168.100.6:3001/users", newUser);
+      setUsers((prevUsers) => [...prevUsers, response.data]); 
+      setNewUser({ name: "", email: "", login: "", password: "", city: "" }); 
+      setAddModalVisible(false);
     } catch (error) {
       console.error("Erro ao adicionar usuário:", error);
       Alert.alert("Erro", "Não foi possível adicionar o usuário.");
     }
   };
 
-  // Função para remover um usuário
   const removeUser = async (id: number) => {
     try {
-      await axios.delete(`http://192.168.100.6:3000/users/${id}`);
-      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id)); // Remove o usuário da lista
+      await axios.delete(`http://192.168.100.6:3001/users/${id}`);
+      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
     } catch (error) {
       console.error("Erro ao remover usuário:", error);
       Alert.alert("Erro", "Não foi possível remover o usuário.");
     }
   };
 
-  // Função para iniciar a edição de um usuário
   const startEditUser = (user: User) => {
     setEditingUser(user);
-    setEditModalVisible(true); // Abre o modal de edição
+    setEditModalVisible(true);
   };
 
-  // Função para salvar as edições do usuário
   const editUser = async () => {
-    if (editingUser && (editingUser.name === "" || editingUser.email === "")) {
-      Alert.alert("Erro", "Nome e email são obrigatórios.");
+    if (editingUser && (editingUser.name === "" || editingUser.email === "" || editingUser.login === "" || editingUser.password === "" || editingUser.city === "")) {
+      Alert.alert("Erro", "Todos os campos são obrigatórios.");
       return;
     }
 
     try {
       if (editingUser) {
-        await axios.put(`http://192.168.100.6:3000/users/${editingUser.id}`, editingUser);
+        await axios.put(`http://192.168.100.6:3001/users/${editingUser.id}`, editingUser);
         setUsers((prevUsers) =>
-            prevUsers.map((user) =>
-                user.id === editingUser.id ? editingUser : user
-            )
+          prevUsers.map((user) =>
+            user.id === editingUser.id ? editingUser : user
+          )
         );
         setEditModalVisible(false); // Fecha o modal de edição
       }
@@ -97,106 +95,135 @@ const HomeScreen = () => {
   };
 
   return (
-      <View style={styles.container}>
-        <Header />
+    <View style={styles.container}>
+      <Header />
+      <TouchableOpacity style={styles.addButton} onPress={() => setAddModalVisible(true)}>
+        <Text style={styles.addButtonText}>Adicionar Usuário</Text>
+      </TouchableOpacity>
+      <FlatList
+        data={users}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.userContainer}>
+            <UserCard id={item.id} name={item.name} email={item.email} />
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.editButton} onPress={() => startEditUser(item)}>
+                <Text style={styles.editButtonText}>✏️</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.removeButton} onPress={() => removeUser(item.id)}>
+                <Text style={styles.removeButtonText}>🗑️</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+        contentContainerStyle={styles.list}
+      />
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={addModalVisible}
+        onRequestClose={() => setAddModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalTitle}>Adicionar Usuário</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Nome"
+              value={newUser.name}
+              onChangeText={(text) => setNewUser({ ...newUser, name: text })}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={newUser.email}
+              onChangeText={(text) => setNewUser({ ...newUser, email: text })}
+              keyboardType="email-address"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Login"
+              value={newUser.login}
+              onChangeText={(text) => setNewUser({ ...newUser, login: text })}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Senha"
+              value={newUser.password}
+              onChangeText={(text) => setNewUser({ ...newUser, password: text })}
+              secureTextEntry={true}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Cidade"
+              value={newUser.city}
+              onChangeText={(text) => setNewUser({ ...newUser, city: text })}
+            />
+            <TouchableOpacity style={styles.saveButton} onPress={AddNewUser}>
+              <Text style={styles.saveButtonText}>Salvar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.cancelButton} onPress={() => setAddModalVisible(false)}>
+              <Text style={styles.cancelButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
-        {/* Botão minimalista para abrir modal de adicionar novo usuário */}
-        <TouchableOpacity style={styles.addButton} onPress={() => setAddModalVisible(true)}>
-          <Text style={styles.addButtonText}>Adicionar Usuário</Text>
-        </TouchableOpacity>
-
-        <FlatList
-            data={users}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-                <View style={styles.userContainer}>
-                  <UserCard id={item.id} name={item.name} email={item.email} />
-                  <View style={styles.buttonContainer}>
-                    {/* Botão minimalista para editar */}
-                    <TouchableOpacity style={styles.editButton} onPress={() => startEditUser(item)}>
-                      <Text style={styles.editButtonText}>✏️</Text>
-                    </TouchableOpacity>
-
-                    {/* Botão minimalista para remover */}
-                    <TouchableOpacity style={styles.removeButton} onPress={() => removeUser(item.id)}>
-                      <Text style={styles.removeButtonText}>🗑️</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-            )}
-            contentContainerStyle={styles.list}
-        />
-
-        {/* Modal para adicionar novo usuário */}
+      {editingUser && (
         <Modal
-            animationType="slide"
-            transparent={true}
-            visible={addModalVisible}
-            onRequestClose={() => setAddModalVisible(false)}
+          animationType="slide"
+          transparent={true}
+          visible={editModalVisible}
+          onRequestClose={() => setEditModalVisible(false)}
         >
           <View style={styles.modalContainer}>
             <View style={styles.modalView}>
-              <Text style={styles.modalTitle}>Adicionar Usuário</Text>
+              <Text style={styles.modalTitle}>Editar Usuário</Text>
               <TextInput
-                  style={styles.input}
-                  placeholder="Nome"
-                  value={newUser.name}
-                  onChangeText={(text) => setNewUser({ ...newUser, name: text })}
+                style={styles.input}
+                placeholder="Nome"
+                value={editingUser.name}
+                onChangeText={(text) => setEditingUser({ ...editingUser, name: text })}
               />
               <TextInput
-                  style={styles.input}
-                  placeholder="Email"
-                  value={newUser.email}
-                  onChangeText={(text) => setNewUser({ ...newUser, email: text })}
-                  keyboardType="email-address"
+                style={styles.input}
+                placeholder="Email"
+                value={editingUser.email}
+                onChangeText={(text) => setEditingUser({ ...editingUser, email: text })}
+                keyboardType="email-address"
               />
-              <TouchableOpacity style={styles.saveButton} onPress={addUser}>
+              <TextInput
+                style={styles.input}
+                placeholder="Login"
+                value={editingUser.login}
+                onChangeText={(text) => setEditingUser({ ...editingUser, login: text })}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Senha"
+                value={editingUser.password}
+                onChangeText={(text) => setEditingUser({ ...editingUser, password: text })}
+                secureTextEntry={true}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Cidade"
+                value={editingUser.city}
+                onChangeText={(text) => setEditingUser({ ...editingUser, city: text })}
+              />
+              <TouchableOpacity style={styles.saveButton} onPress={editUser}>
                 <Text style={styles.saveButtonText}>Salvar</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cancelButton} onPress={() => setAddModalVisible(false)}>
+              <TouchableOpacity style={styles.cancelButton} onPress={() => setEditModalVisible(false)}>
                 <Text style={styles.cancelButtonText}>Cancelar</Text>
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
+      )}
 
-        {/* Modal para editar usuário */}
-        {editingUser && (
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={editModalVisible}
-                onRequestClose={() => setEditModalVisible(false)}
-            >
-              <View style={styles.modalContainer}>
-                <View style={styles.modalView}>
-                  <Text style={styles.modalTitle}>Editar Usuário</Text>
-                  <TextInput
-                      style={styles.input}
-                      placeholder="Nome"
-                      value={editingUser.name}
-                      onChangeText={(text) => setEditingUser({ ...editingUser, name: text })}
-                  />
-                  <TextInput
-                      style={styles.input}
-                      placeholder="Email"
-                      value={editingUser.email}
-                      onChangeText={(text) => setEditingUser({ ...editingUser, email: text })}
-                      keyboardType="email-address"
-                  />
-                  <TouchableOpacity style={styles.saveButton} onPress={editUser}>
-                    <Text style={styles.saveButtonText}>Salvar</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.cancelButton} onPress={() => setEditModalVisible(false)}>
-                    <Text style={styles.cancelButtonText}>Cancelar</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </Modal>
-        )}
-
-        <Footer />
-      </View>
+      <Footer />
+    </View>
   );
 };
 

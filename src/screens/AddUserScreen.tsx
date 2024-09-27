@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
-import axios from "axios"; // Importando o axios
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import axios from "axios";
 
 const RegisterScreen = () => {
-    // Estado para armazenar os dados do novo usuário
     const [newUser, setNewUser] = useState({
         name: "",
         email: "",
@@ -12,7 +11,6 @@ const RegisterScreen = () => {
         city: "",
     });
 
-    // Função para adicionar um novo usuário
     const addUser = async () => {
         if (newUser.name === "" || newUser.email === "" || newUser.login === "" || newUser.password === "" || newUser.city === "") {
             Alert.alert("Erro", "Todos os campos são obrigatórios.");
@@ -20,11 +18,8 @@ const RegisterScreen = () => {
         }
 
         try {
-            const response = await axios.post("http://192.168.100.6:3000/users", newUser);
-            // Se a requisição for bem-sucedida, exibe uma mensagem de sucesso
+            await axios.post("http://192.168.100.6:3001/users", newUser);
             Alert.alert("Sucesso", "Usuário cadastrado com sucesso!");
-
-            // Limpa os campos do formulário
             setNewUser({
                 name: "",
                 email: "",
@@ -75,7 +70,9 @@ const RegisterScreen = () => {
                 onChangeText={(text) => setNewUser({ ...newUser, city: text })}
             />
 
-            <Button title="Cadastrar" onPress={addUser} />
+            <TouchableOpacity style={styles.button} onPress={addUser}>
+                <Text style={styles.buttonText}>Cadastrar</Text>
+            </TouchableOpacity>
         </View>
     );
 };
@@ -84,22 +81,37 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: "#fff",
+        backgroundColor: "#f4f4f4",
         justifyContent: "center",
     },
     title: {
-        fontSize: 24,
+        fontSize: 28,
         fontWeight: "bold",
-        marginBottom: 20,
+        color: "#333",
+        marginBottom: 30,
         textAlign: "center",
     },
     input: {
-        height: 40,
-        borderColor: "#ccc",
+        height: 50,
+        borderColor: "#ddd",
         borderWidth: 1,
-        marginBottom: 10,
-        paddingHorizontal: 10,
-        borderRadius: 5,
+        marginBottom: 15,
+        paddingHorizontal: 15,
+        borderRadius: 10,
+        backgroundColor: "#fff",
+        fontSize: 16,
+    },
+    button: {
+        backgroundColor: "#007BFF",
+        paddingVertical: 15,
+        borderRadius: 10,
+        alignItems: "center",
+        marginTop: 10,
+    },
+    buttonText: {
+        color: "#fff",
+        fontSize: 18,
+        fontWeight: "600",
     },
 });
 

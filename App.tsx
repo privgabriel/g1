@@ -75,6 +75,7 @@ const App = () => {
                 <Drawer.Screen name="About" component={AboutScreen} />
                 <Drawer.Screen name="Add New User" component={AddUserScreen} />
                 <Drawer.Screen name="Edit Users" component={EditUsersScreen} />
+                <Drawer.Screen name="User Details" component={UserDetailsScreen} />
             </Drawer.Navigator>
         </NavigationContainer>
     );

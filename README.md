@@ -32,8 +32,3 @@ O **MyApp** é um aplicativo de gerenciamento de usuários desenvolvido em **Rea
 - **Tela de Listagem e Edição de Usuários:** Exibe uma lista de usuários cadastrados e permite selecionar um usuário para editar suas informações. Inclui uma caixa de pesquisa para filtrar os resultados.
 - **Tela de Detalhes do Usuário:** Exibe detalhes como nome, email, login e cidade, além de permitir a edição.
 
-### Instalação e Execução
-
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/seu-usuario/myapp.git

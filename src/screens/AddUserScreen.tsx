@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import axios from "axios";
+import { Picker } from "@react-native-picker/picker";
 
 const RegisterScreen = () => {
     const [newUser, setNewUser] = useState({
@@ -63,12 +64,21 @@ const RegisterScreen = () => {
                 onChangeText={(text) => setNewUser({ ...newUser, password: text })}
                 secureTextEntry
             />
-            <TextInput
-                style={styles.input}
-                placeholder="Cidade"
-                value={newUser.city}
-                onChangeText={(text) => setNewUser({ ...newUser, city: text })}
-            />
+
+            <Text style={styles.label}>Cidade</Text>
+            <View style={styles.pickerContainer}>
+                <Picker
+                    selectedValue={newUser.city}
+                    onValueChange={(itemValue) => setNewUser({ ...newUser, city: itemValue })}
+                    style={styles.picker}
+                >
+                    <Picker.Item label="Selecione a cidade" value="" />
+                    <Picker.Item label="Santa Maria" value="Santa Maria" />
+                    <Picker.Item label="Porto Alegre" value="Porto Alegre" />
+                    <Picker.Item label="Florianópolis" value="Florianópolis" />
+                    <Picker.Item label="Curitiba" value="Curitiba" />
+                </Picker>
+            </View>
 
             <TouchableOpacity style={styles.button} onPress={addUser}>
                 <Text style={styles.buttonText}>Cadastrar</Text>
@@ -100,6 +110,22 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         backgroundColor: "#fff",
         fontSize: 16,
+    },
+    label: {
+        fontSize: 16,
+        marginBottom: 10,
+        color: "#333",
+    },
+    pickerContainer: {
+        borderColor: "#ddd",
+        borderWidth: 1,
+        borderRadius: 10,
+        marginBottom: 15,
+        backgroundColor: "#fff",
+    },
+    picker: {
+        height: 50,
+        color: "#333",
     },
     button: {
         backgroundColor: "#007BFF",

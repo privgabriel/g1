@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useCallback } from "react";
 import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Modal, Alert } from "react-native";
 import axios from "axios";
+import { useFocusEffect } from "@react-navigation/native";
 
 type User = {
   id: number;
@@ -28,9 +29,11 @@ const UserDetailsScreen = () => {
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchUsers();
+    }, [])
+  );
 
   const handleSearch = (text: string) => {
     setSearchTerm(text);

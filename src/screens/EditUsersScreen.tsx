@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useCallback } from "react";
 import { View, StyleSheet, TextInput, TouchableOpacity, Text, Modal, FlatList, Alert } from "react-native";
 import axios from "axios";
+import { useFocusEffect } from "@react-navigation/native";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -31,9 +32,11 @@ const EditUserScreen = () => {
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchUsers();
+    }, [])
+  );
 
   const handleSearch = (text: string) => {
     setSearchTerm(text);
@@ -69,7 +72,7 @@ const EditUserScreen = () => {
       await axios.put(`http://192.168.100.6:3001/users/${editingUser.id}`, editingUser);
       Alert.alert("Sucesso", "Usuário atualizado com sucesso!");
       setEditModalVisible(false);
-      fetchUsers();
+      fetchUsers(); // Atualiza a lista de usuários após a edição
     } catch (error) {
       console.error("Erro ao editar usuário:", error);
       Alert.alert("Erro", "Não foi possível editar o usuário.");
